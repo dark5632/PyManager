@@ -15,7 +15,7 @@ Future plans include developing the project, expanding its range of features, an
   
 * **High Performance.** Zero overhead, near-instant startup time, and minimal system resource consumption.
 
-* **open source** If there is something you don’t like, you can change it by downloading the project’s source code.
+* **Open Source** If there is something you don’t like, you can change it by downloading the project’s source code.
 
   <img width="1196" height="824" alt="Снимок экрана 2026-10-25 115258" src="https://github.com/user-attachments/assets/c50241ef-8d1d-4c89-a7ad-b7c916049b9f" />
 
