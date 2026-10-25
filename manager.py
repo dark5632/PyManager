@@ -2,6 +2,8 @@ import sys
 import os
 import json
 import shutil
+import codecs
+import html
 from pathlib import Path
 from datetime import datetime
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
@@ -13,7 +15,6 @@ from PySide6.QtCore import Qt, QProcess, QSize, QRegularExpression, QPoint
 from PySide6.QtGui import (QFont, QIcon, QPixmap, QSyntaxHighlighter, QTextCharFormat, 
                            QColor, QShortcut, QKeySequence, QPalette)
 
-# --- ПОИСК РЕСУРСОВ В EXE ---
 def get_resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
@@ -73,11 +74,12 @@ ICON_FILE = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 ICON_PLUS = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>"""
 ICON_IMPORT = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>"""
 ICON_PLAY = """<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>"""
+ICON_STOP = """<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>"""
 ICON_BOX = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>"""
 ICON_SAVE = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>"""
 ICON_SETTINGS = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>"""
 
-# --- БАЗОВЫЙ КЛАСС ДЛЯ ДИАЛОГОВ ---
+# --- ДИАЛОГИ ---
 class StyledDialog(QDialog):
     def __init__(self, parent, title_text):
         super().__init__(parent)
@@ -173,8 +175,8 @@ class DeleteFileDialog(StyledDialog):
         self.setFixedSize(350, 180)
         lbl = QLabel(f"Вы точно хотите {action_text} файл\n<b>{filename}</b>?")
         lbl.setObjectName("dialogText")
-        lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lbl.setWordWrap(True)
+        # Убрали выравнивание по центру, теперь по левому краю
         self.layout.addWidget(lbl)
         btn_layout = QHBoxLayout()
         btn_cancel = QPushButton("Нет")
@@ -190,17 +192,21 @@ class DeleteFileDialog(StyledDialog):
 class SettingsDialog(StyledDialog):
     def __init__(self, parent=None):
         super().__init__(parent, "Настройки")
-        self.setFixedSize(350, 260)
+        self.setFixedSize(520, 400) 
+        
         self.check_theme = QCheckBox("Темная тема")
         self.check_theme.setChecked(parent.current_theme == "dark")
         self.check_theme.setObjectName("settingSwitch")
-        self.check_theme.toggled.connect(parent.toggle_theme)
+        # Изменено на внутренний метод для обновления стиля
+        self.check_theme.toggled.connect(self.toggle_theme_local) 
         self.layout.addWidget(self.check_theme)
+        
         self.check_autosave = QCheckBox("Автосохранение")
         self.check_autosave.setChecked(parent.auto_save_enabled)
         self.check_autosave.setObjectName("settingSwitch")
         self.check_autosave.toggled.connect(self.toggle_autosave)
         self.layout.addWidget(self.check_autosave)
+        
         font_layout = QHBoxLayout()
         lbl_font = QLabel("Размер шрифта:")
         lbl_font.setObjectName("settingLabel")
@@ -213,14 +219,102 @@ class SettingsDialog(StyledDialog):
         font_layout.addWidget(self.spin_font)
         font_layout.addStretch()
         self.layout.addLayout(font_layout)
+        
+        lbl_cmd = QLabel("Команда запуска (файл добавится в конец):")
+        lbl_cmd.setObjectName("settingLabel")
+        self.layout.addWidget(lbl_cmd)
+        
+        self.input_run_cmd = QLineEdit()
+        self.input_run_cmd.setText(parent.custom_run_cmd)
+        self.input_run_cmd.setObjectName("dialogInput")
+        self.input_run_cmd.setFixedHeight(38)
+        self.input_run_cmd.textChanged.connect(self.save_run_cmd)
+        self.layout.addWidget(self.input_run_cmd)
+
         self.layout.addStretch()
         btn_close = QPushButton("Закрыть")
         btn_close.setObjectName("dialogBtnAction")
         btn_close.clicked.connect(self.accept)
         self.layout.addWidget(btn_close)
 
+    def toggle_theme_local(self, checked):
+        # Сначала сообщаем главному окну
+        self.parent_window.toggle_theme(checked)
+        # Затем применяем стиль к самим настройкам, используя актуальную тему главного окна
+        self.apply_style(self.parent_window.current_theme)
+
     def toggle_autosave(self, checked):
         self.parent_window.auto_save_enabled = checked
+        
+    def save_run_cmd(self, text):
+        self.parent_window.custom_run_cmd = text
+
+class CompileMethodDialog(StyledDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent, "Сборка проекта")
+        self.setFixedSize(400, 260)
+        
+        lbl = QLabel("Каким способом вы хотите собрать программу?")
+        lbl.setObjectName("dialogText")
+        lbl.setWordWrap(True)
+        # Убрали выравнивание по центру
+        self.layout.addWidget(lbl)
+        
+        self.choice = None
+        
+        btn_layout = QVBoxLayout()
+        btn_std = QPushButton("Стандартным (PyInstaller)")
+        btn_std.setObjectName("dialogBtnAction")
+        btn_std.clicked.connect(self.choose_std)
+        
+        btn_custom = QPushButton("Выбрать свою команду")
+        btn_custom.setObjectName("dialogBtnCancel")
+        btn_custom.clicked.connect(self.choose_custom)
+        
+        btn_cancel = QPushButton("Закрыть")
+        btn_cancel.setObjectName("dialogBtnCancel")
+        btn_cancel.clicked.connect(self.reject)
+        
+        btn_layout.addWidget(btn_std)
+        btn_layout.addWidget(btn_custom)
+        btn_layout.addWidget(btn_cancel)
+        self.layout.addLayout(btn_layout)
+
+    def choose_std(self):
+        self.choice = "std"
+        self.accept()
+        
+    def choose_custom(self):
+        self.choice = "custom"
+        self.accept()
+
+class CustomCompileDialog(StyledDialog):
+    def __init__(self, parent=None, current_cmd=""):
+        super().__init__(parent, "Укажите команду .py")
+        self.setFixedSize(480, 200)
+        
+        lbl = QLabel("Введите команду (файл .py добавится в конец автоматически):")
+        lbl.setObjectName("dialogText")
+        lbl.setWordWrap(True)
+        # Убрали выравнивание по центру
+        self.layout.addWidget(lbl)
+        
+        self.input = QLineEdit()
+        self.input.setText(current_cmd)
+        self.input.setObjectName("dialogInput")
+        self.input.setFixedHeight(38)
+        self.layout.addWidget(self.input)
+        
+        btn_layout = QHBoxLayout()
+        btn_cancel = QPushButton("Отмена")
+        btn_cancel.setObjectName("dialogBtnCancel")
+        btn_cancel.clicked.connect(self.reject)
+        btn_ok = QPushButton("Собрать")
+        btn_ok.setObjectName("dialogBtnAction")
+        btn_ok.clicked.connect(self.accept)
+        btn_layout.addWidget(btn_cancel)
+        btn_layout.addWidget(btn_ok)
+        self.layout.addLayout(btn_layout)
 
 # --- ГЛАВНОЕ ОКНО ---
 class PythonManager(QMainWindow):
@@ -229,7 +323,6 @@ class PythonManager(QMainWindow):
         self.setWindowTitle("PyManager")
         self.resize(1200, 800)
         
-        # Иконка приложения
         icon_path_ico = get_resource_path("app_icon.ico")
         icon_path_png = get_resource_path("app_icon.png")
         if os.path.exists(icon_path_ico):
@@ -237,9 +330,7 @@ class PythonManager(QMainWindow):
         elif os.path.exists(icon_path_png):
             self.setWindowIcon(QIcon(icon_path_png))
         
-        # --- ПУТИ СОХРАНЕНИЯ (В ПРОФИЛЕ ПОЛЬЗОВАТЕЛЯ) ---
         if getattr(sys, 'frozen', False):
-            # Создаем папку C:\Users\Name\PyManager
             self.base_dir = Path.home() / "PyManager"
         else:
             self.base_dir = Path(__file__).parent.resolve()
@@ -257,9 +348,15 @@ class PythonManager(QMainWindow):
         self.process.readyReadStandardError.connect(self.handle_stderr)
         self.process.finished.connect(self.process_finished)
         
+        self.stdout_decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+        self.stderr_decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+        
         self.current_theme = "dark"
         self.font_size = 11
         self.auto_save_enabled = True
+        
+        self.custom_run_cmd = 'python -X utf8'
+        self.last_custom_compile_cmd = 'python -m PyInstaller --noconfirm --onefile --windowed'
         
         self.file_logs = {} 
         self.active_file_path = None
@@ -294,7 +391,6 @@ class PythonManager(QMainWindow):
         main_layout.setContentsMargins(10, 10, 10, 10) 
         main_layout.setSpacing(10)
 
-        # --- ЛЕВАЯ ПАНЕЛЬ ---
         self.sidebar_container = QFrame()
         self.sidebar_container.setObjectName("sidebarContainer")
         self.sidebar_container.setFixedWidth(300)
@@ -315,6 +411,14 @@ class PythonManager(QMainWindow):
         self.btn_run.setObjectName("activityBtn")
         self.btn_run.clicked.connect(self.run_script)
         activity_layout.addWidget(self.btn_run, alignment=Qt.AlignHCenter)
+
+        self.btn_stop = QToolButton()
+        self.btn_stop.setIconSize(QSize(24, 24))
+        self.btn_stop.setToolTip("Остановить процесс")
+        self.btn_stop.setObjectName("activityBtn")
+        self.btn_stop.clicked.connect(self.stop_script)
+        self.btn_stop.hide()
+        activity_layout.addWidget(self.btn_stop, alignment=Qt.AlignHCenter)
 
         self.btn_compile = QToolButton()
         self.btn_compile.setIconSize(QSize(24, 24))
@@ -382,7 +486,6 @@ class PythonManager(QMainWindow):
         sidebar_layout.addWidget(self.explorer_panel)
         main_layout.addWidget(self.sidebar_container)
 
-        # --- РАБОЧАЯ ОБЛАСТЬ ---
         self.work_area = QWidget()
         self.work_area.setObjectName("workArea")
         work_layout = QVBoxLayout(self.work_area)
@@ -391,7 +494,6 @@ class PythonManager(QMainWindow):
 
         self.work_stack = QStackedWidget()
         
-        # Приветственный экран
         self.welcome_widget = QWidget()
         welcome_layout = QVBoxLayout(self.welcome_widget)
         welcome_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -423,7 +525,6 @@ class PythonManager(QMainWindow):
 
         self.work_stack.addWidget(self.welcome_widget)
 
-        # Редактор и консоль
         self.right_splitter = QSplitter(Qt.Orientation.Vertical)
         self.right_splitter.setObjectName("rightSplitter")
 
@@ -450,7 +551,6 @@ class PythonManager(QMainWindow):
         work_layout.addWidget(self.work_stack)
         main_layout.addWidget(self.work_area, 1)
 
-    # --- ЛОГИКА ---
     def import_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Выберите Python файл", "", "Python Files (*.py)")
         if file_path:
@@ -613,7 +713,6 @@ class PythonManager(QMainWindow):
         self.editor.setFont(font)
 
     def load_file_to_editor(self, current, previous):
-        # Автосохранение предыдущего файла при переключении
         if previous and previous.data(Qt.ItemDataRole.UserRole):
             prev_path = previous.data(Qt.ItemDataRole.UserRole)
             self.save_file_by_path(prev_path, silent=True)
@@ -657,12 +756,6 @@ class PythonManager(QMainWindow):
         file_path = item.data(Qt.ItemDataRole.UserRole)
         return self.save_file_by_path(file_path, silent=False)
 
-    def get_python_exe(self):
-        if getattr(sys, 'frozen', False):
-            python_exe = shutil.which("python") or shutil.which("python3")
-            return python_exe or r"C:\Users\danni\AppData\Local\Python\pythoncore-3.15-64\python.exe"
-        return sys.executable
-
     def refresh_list(self):
         current_path = self.active_file_path
         self.list_widget.clear()
@@ -698,8 +791,6 @@ class PythonManager(QMainWindow):
             
         file_path = item.data(Qt.ItemDataRole.UserRole)
         file_name = Path(file_path).name
-        python_exe = self.get_python_exe()
-        if not python_exe: return
 
         self.console.clear()
         if self.active_file_path: self.file_logs[self.active_file_path] = ""
@@ -708,8 +799,26 @@ class PythonManager(QMainWindow):
         self.append_console(f"<span style='color:#007acc;'>ЗАПУСК: {file_name} [{datetime.now().strftime('%H:%M:%S')}]</span>")
         self.append_console(f"<span style='color:#007acc;'>========================================</span><br>")
         
-        self.set_buttons_enabled(False)
-        self.process.start(python_exe, [file_path])
+        self.set_process_running(True)
+        
+        cmd_str = f'{self.custom_run_cmd} "{file_path}"'
+        
+        self.stdout_decoder.reset()
+        self.stderr_decoder.reset()
+        self.process.start(cmd_str)
+
+    def stop_script(self):
+        if self.process.state() == QProcess.ProcessState.Running:
+            self.append_console(f"<br><span style='color:#e11d48;'>[ОСТАНОВКА] Процесс принудительно завершен.</span>")
+            self.process.kill()
+
+    def set_process_running(self, running):
+        self.btn_run.setVisible(not running)
+        self.btn_stop.setVisible(running)
+        self.btn_compile.setEnabled(not running)
+        self.btn_save.setEnabled(not running)
+        self.btn_import.setEnabled(not running)
+        self.btn_new_file.setEnabled(not running)
 
     def compile_script(self):
         item = self.list_widget.currentItem()
@@ -718,52 +827,91 @@ class PythonManager(QMainWindow):
         
         file_path = Path(item.data(Qt.ItemDataRole.UserRole))
         
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                source_code = f.read()
+            compile(source_code, str(file_path), 'exec')
+        except SyntaxError as e:
+            self.console.clear()
+            if self.active_file_path: self.file_logs[self.active_file_path] = ""
+            self.append_console(f"<span style='color:#f44747;'>[ОШИБКА СИНТАКСИСА] Не удалось собрать проект.</span>")
+            self.append_console(f"<span style='color:#f44747;'>Строка {e.lineno}, позиция {e.offset}: {e.msg}</span>")
+            self.append_console(f"<span style='color:#f44747;'>{e.text.strip() if e.text else ''}</span>")
+            return
+
         if self.project_dir not in file_path.parents:
             out_dir = QFileDialog.getExistingDirectory(self, "Выберите папку для сохранения .exe")
             if not out_dir: return
         else:
             out_dir = str(file_path.parent)
 
-        python_exe = self.get_python_exe()
+        method_dialog = CompileMethodDialog(self)
         
-        self.console.clear()
-        if self.active_file_path: self.file_logs[self.active_file_path] = ""
-
-        self.append_console(f"<br><span style='color:#d7ba7d;'>========================================</span>")
-        self.append_console(f"<span style='color:#d7ba7d;'>СБОРКА EXE: {file_path.name}</span>")
-        self.append_console(f"<span style='color:#d7ba7d;'>Папка сохранения: {out_dir}</span>")
-        self.append_console(f"<span style='color:#d7ba7d;'>========================================</span><br>")
-        
-        self.set_buttons_enabled(False)
-        
-        self.process.start(python_exe, [
-            "-m", "PyInstaller", "--noconfirm", "--onefile", 
-            "--distpath", out_dir,
-            str(file_path)
-        ])
-
-    def set_buttons_enabled(self, enabled):
-        self.btn_run.setEnabled(enabled)
-        self.btn_compile.setEnabled(enabled)
-        self.list_widget.setEnabled(enabled)
-        self.btn_save.setEnabled(enabled)
-        self.btn_import.setEnabled(enabled)
-        self.btn_new_file.setEnabled(enabled)
+        while True:
+            geo = self.geometry()
+            method_dialog.move(geo.center() - method_dialog.rect().center())
+            
+            if not method_dialog.exec():
+                return 
+                
+            if method_dialog.choice == "std":
+                self.console.clear()
+                if self.active_file_path: self.file_logs[self.active_file_path] = ""
+                self.append_console(f"<br><span style='color:#d7ba7d;'>========================================</span>")
+                self.append_console(f"<span style='color:#d7ba7d;'>СБОРКА (Стандарт): {file_path.name}</span>")
+                self.append_console(f"<span style='color:#d7ba7d;'>Папка: {out_dir}</span>")
+                self.append_console(f"<span style='color:#d7ba7d;'>========================================</span><br>")
+                
+                self.set_process_running(True)
+                self.stdout_decoder.reset()
+                self.stderr_decoder.reset()
+                cmd_str = f'python -m PyInstaller --noconfirm --onefile --distpath "{out_dir}" "{file_path}"'
+                self.process.start(cmd_str)
+                break
+                
+            elif method_dialog.choice == "custom":
+                cmd_dialog = CustomCompileDialog(self, self.last_custom_compile_cmd)
+                cmd_dialog.move(geo.center() - cmd_dialog.rect().center())
+                
+                if cmd_dialog.exec():
+                    cmd_template = cmd_dialog.input.text().strip()
+                    self.last_custom_compile_cmd = cmd_template 
+                    
+                    cmd_str = f'{cmd_template} "{file_path}"'
+                    
+                    self.console.clear()
+                    if self.active_file_path: self.file_logs[self.active_file_path] = ""
+                    self.append_console(f"<br><span style='color:#d7ba7d;'>========================================</span>")
+                    self.append_console(f"<span style='color:#d7ba7d;'>СБОРКА (Своя команда): {file_path.name}</span>")
+                    self.append_console(f"<span style='color:#d7ba7d;'>Команда: {cmd_str}</span>")
+                    self.append_console(f"<span style='color:#d7ba7d;'>========================================</span><br>")
+                    
+                    self.set_process_running(True)
+                    self.stdout_decoder.reset()
+                    self.stderr_decoder.reset()
+                    self.process.start(cmd_str)
+                    break
+                else:
+                    method_dialog = CompileMethodDialog(self)
 
     def handle_stdout(self):
-        data = self.process.readAllStandardOutput().data().decode('utf-8', errors='ignore')
-        if data:
-            self.append_console(data.replace("\n", "<br>"))
+        raw_data = self.process.readAllStandardOutput().data()
+        text = self.stdout_decoder.decode(raw_data)
+        if text:
+            safe_text = html.escape(text).replace("\n", "<br>")
+            self.append_console(safe_text)
             self.console.ensureCursorVisible()
 
     def handle_stderr(self):
-        data = self.process.readAllStandardError().data().decode('utf-8', errors='ignore')
-        if data:
-            self.append_console(f"<span style='color:#f44747;'>{data.replace(chr(10), '<br>')}</span>")
+        raw_data = self.process.readAllStandardError().data()
+        text = self.stderr_decoder.decode(raw_data)
+        if text:
+            safe_text = html.escape(text).replace("\n", "<br>")
+            self.append_console(f"<span style='color:#f44747;'>{safe_text}</span>")
             self.console.ensureCursorVisible()
 
     def process_finished(self, exit_code, exit_status):
-        self.set_buttons_enabled(True)
+        self.set_process_running(False)
         color = "#89d185" if exit_code == 0 else "#f44747"
         status = "УСПЕШНО" if exit_code == 0 else f"С ОШИБКОЙ (Код {exit_code})"
         self.append_console(f"<br><span style='color:{color};'>[ЗАВЕРШЕНО] Процесс {status}.</span>")
@@ -772,6 +920,7 @@ class PythonManager(QMainWindow):
         icon_color = "#cccccc" if self.current_theme == "dark" else "#333333"
 
         self.btn_run.setIcon(get_svg_icon(ICON_PLAY, icon_color))
+        self.btn_stop.setIcon(get_svg_icon(ICON_STOP, "#e11d48"))
         self.btn_compile.setIcon(get_svg_icon(ICON_BOX, icon_color))
         self.btn_save.setIcon(get_svg_icon(ICON_SAVE, icon_color))
         self.btn_settings.setIcon(get_svg_icon(ICON_SETTINGS, icon_color))
