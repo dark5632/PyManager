@@ -1,4 +1,5 @@
 # PyManager
+
 <h6><span style="color: #888888; font-weight: normal; letter-spacing: 1px;">LIGHTWEIGHT PYTHON ENVIRONMENT</span></h6>
 
 A professional, minimalist tool designed for creating, editing, and deploying Python scripts. Built as a lightweight alternative to heavy IDEs for developers who value speed, efficiency, and a clean workspace.
@@ -34,13 +35,25 @@ Future plans include developing the project, expanding its range of features, an
   </thead>
   <tbody>
     <tr>
-      <td>  Windows  </td>
-      <td><strong>  PyManager  </strong></td>
-      <td><code>  v1.0.0  </code></td>
+      <td>Windows</td>
+      <td><strong>PyManager</strong></td>
+      <td><code>v1.0.1</code> 🚀</td>
+      <td>
+        <a href="https://github.com/dark5632/PyManager/releases/download/1.0.1/PyManager.exe" download style="text-decoration: none;">
+          <span style="background-color: #ffffff; color: #1a1a1a; padding: 6px 16px; border: 1px solid #ffffff; border-radius: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; font-size: 13px; display: inline-block; box-shadow: 0px 0px 10px rgba(255,255,255,0.2);">
+            Download NOW
+          </span>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td><span style="color: #666666;">Windows</span></td>
+      <td><span style="color: #666666;">PyManager</span></td>
+      <td><span style="color: #666666;"><code>v1.0.0</code></span></td>
       <td>
         <a href="https://github.com/dark5632/PyManager/releases/download/1.0.0/PyManager.exe" download style="text-decoration: none;">
-          <span style="background-color: #24292e; color: #ffffff; padding: 4px 12px; border-radius: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 600; font-size: 12px; display: inline-block;">
-            Download .exe
+          <span style="background-color: transparent; color: #555555; padding: 4px 12px; border: 1px solid #333333; border-radius: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; font-size: 12px; display: inline-block;">
+            Legacy
           </span>
         </a>
       </td>
@@ -48,6 +61,7 @@ Future plans include developing the project, expanding its range of features, an
   </tbody>
 </table>
 
+
 ---
 
-<h6><span style="color: #888888; font-weight: normal; letter-spacing: 1px;">Final Version: 1.0.0 | Creator: Dark5632</span></h6>
+<h6><span style="color: #888888; font-weight: normal; letter-spacing: 1px;">Final Version: 1.0.1 | Creator: Dark5632</span></h6>
