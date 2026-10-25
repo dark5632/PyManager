@@ -1,23 +1,28 @@
 # PyManager
 <h6><span style="color: #888888; font-weight: normal; letter-spacing: 1px;">LIGHTWEIGHT PYTHON ENVIRONMENT</span></h6>
 
-Профессиональный минималистичный инструмент для создания, редактирования и развертывания скриптов Python. Разработан как легкая альтернатива тяжелым IDE для тех, кому важна скорость и чистота рабочего пространства.
+A professional, minimalist tool designed for creating, editing, and deploying Python scripts. Built as a lightweight alternative to heavy IDEs for developers who value speed, efficiency, and a clean workspace.
 
-### Ключевые возможности
+The best tool for small-scale developers working with Python. This product offers both simplicity and reliability. 
 
-* **Чистый интерфейс.** Фокус исключительно на коде без лишних элементов и перегруженных меню.
+Future plans include developing the project, expanding its range of features, and transforming the software into the number one product on the market.
+
+### Key Features
+
+* **Clean Interface.** Focus exclusively on your code without cluttered menus or unnecessary elements.
   
-* **Быстрый цикл разработки.** Встроенные инструменты компиляции и мгновенного запуска скриптов в один клик.
+* **Rapid Workflow.** Integrated tools for one-click compilation and instant script execution right inside the app.
   
-* **Высокая производительность.** Нулевое потребление лишних ресурсов системы и моментальный отклик.
-  
+* **High Performance.** Zero overhead, near-instant startup time, and minimal system resource consumption.
 
 ---
-
+Download now:
 <p align="left">
   <a href="https://github.com/dark5632/PyManager/releases/download/1.0.0/PyManager.exe" style="text-decoration: none;">
     <span style="background-color: #24292e; color: #ffffff; padding: 10px 20px; border-radius: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 600; font-size: 14px; display: inline-block;">
-      Скачать для Windows (.exe)
+      Download for Windows (.exe)
     </span>
   </a>
 </p>
+
+Version: 1.0.0
