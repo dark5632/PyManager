@@ -15,6 +15,8 @@ Future plans include developing the project, expanding its range of features, an
   
 * **High Performance.** Zero overhead, near-instant startup time, and minimal system resource consumption.
 
+* **open source** If there is something you don’t like, you can change it by downloading the project’s source code.
+
 ---
 Download now:
 <p align="left">
