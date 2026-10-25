@@ -20,13 +20,34 @@ Future plans include developing the project, expanding its range of features, an
   <img width="1196" height="824" alt="Снимок экрана 2026-10-25 115258" src="https://github.com/user-attachments/assets/c50241ef-8d1d-4c89-a7ad-b7c916049b9f" />
 
 ---
-Download now:
-<p align="left">
-  <a href="https://github.com/dark5632/PyManager/releases/download/1.0.0/PyManager.exe" style="text-decoration: none;">
-    <span style="background-color: #24292e; color: #ffffff; padding: 10px 20px; border-radius: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 600; font-size: 14px; display: inline-block;">
-      Download for Windows (.exe)
-    </span>
-  </a>
-</p>
 
-Version: 1.0.0
+### Downloads
+
+<table>
+  <thead>
+    <tr>
+      <th align="left">Platform</th>
+      <th align="left">Application</th>
+      <th align="left">Version</th>
+      <th align="left">Download</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>  Windows  </td>
+      <td><strong>  PyManager  </strong></td>
+      <td><code>  v1.0.0  </code></td>
+      <td>
+        <a href="https://github.com/dark5632/PyManager/releases/download/1.0.0/PyManager.exe" download style="text-decoration: none;">
+          <span style="background-color: #24292e; color: #ffffff; padding: 4px 12px; border-radius: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 600; font-size: 12px; display: inline-block;">
+            Download .exe
+          </span>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h6><span style="color: #888888; font-weight: normal; letter-spacing: 1px;">Final Version: 1.0.0 | Creator: Dark5632</span></h6>
